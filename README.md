@@ -118,7 +118,7 @@ En ambos casos realiza lo siguiente:
 * ¿Se aproxima a la ley de Zipf? Justifiquen su respuesta comparándolo con el comportamiento del corpus visto en clase.
 
 > [!TIP]
-> Puedes utilizar los corpus del paquete [`py-elotl`](TODO)
+> Puedes utilizar los corpus del paquete [`py-elotl`](https://pypi.org/project/elotl/)
 
 ### 2. Visualizando la diversidad lingüística de México
 
@@ -134,7 +134,7 @@ Responde las preguntas:
 - ¿Cuál es la zona que dirias que tiene mayor diversidad en México?
 
 > [!TIP]
-> Utiliza la biblioteca [`plotly`]() para crear mapa interactivos
+> Utiliza la biblioteca [`plotly`](https://plotly.com/python/getting-started/) para crear mapa interactivos
 
 ### EXTRA. Desempeño de NER en distintos dominios (Out-of-domain)
 
@@ -144,4 +144,4 @@ Explorar la plataforma [Hugging Face Datasets](https://huggingface.co/datasets) 
 * **Análisis:** Incluyan comentarios críticos sobre el desempeño observado. ¿En qué dominio el modelo cometió más errores y a qué creen que se deba estadísticamente?
 
 > [!TIP]
-> Utiliza bibliotecas con modelos preentrenados que te permitan realizar el etiquetado NER como [`spacy`]() o [`stanza`]()
+> Utiliza bibliotecas con modelos preentrenados que te permitan realizar el etiquetado NER como [`spacy`](https://spacy.io/usage) o [`stanza`](https://stanfordnlp.github.io/stanza/#getting-started).
