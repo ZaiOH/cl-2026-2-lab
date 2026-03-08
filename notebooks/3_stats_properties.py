@@ -15,6 +15,10 @@
 
 # # 3. Propiedades estadísticas del lenguaje
 
+# <a target="_blank" href="https://colab.research.google.com/github/umoqnier/cl-2026-2-lab/blob/main/notebooks/3_stats_properties.ipynb">
+#   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+# </a>
+
 # ## Objetivos
 
 # - Mostrar el uso de CFG y derivados
@@ -48,10 +52,6 @@
 # * $O$ simbolo inicial o nodo raíz.
 # * $R$ reglas de la forma $X \longrightarrow \gamma$ donde $X$ es no terminal y $\gamma$ es una secuencia de terminales y no terminales
 
-import nltk
-import pandas as pd
-import numpy as np
-
 plain_grammar = """
 S -> NP VP
 NP -> Det N | Det N PP | 'I'
@@ -64,6 +64,8 @@ P -> 'in'
 """
 
 # +
+import nltk
+
 grammar = nltk.CFG.fromstring(plain_grammar)
 # Cambiar analizador y trace
 analyzer = nltk.ChartParser(grammar)
@@ -74,7 +76,7 @@ trees = analyzer.parse(sentence)
 
 for tree in trees:
     print(tree, type(tree))
-    print('\nBosquejo del árbol:\n')
+    print("\nBosquejo del árbol:\n")
     print(tree.pretty_print(unicodelines=True, nodedist=1))
 
 # ## Perspectiva estadística
@@ -106,10 +108,7 @@ V    -> 'come'    [1.0]
 """)
 viterbi_parser = nltk.ViterbiParser(taco_grammar)
 
-sentences = [
-    "Juan come unos tacos",
-    "unos tacos Juan come"
-]
+sentences = ["Juan come unos tacos", "unos tacos Juan come"]
 for sent in sentences:
     for tree in viterbi_parser.parse(sent.split()):
         print(tree)
@@ -125,9 +124,9 @@ for sent in sentences:
 import spacy
 from spacy import displacy
 
-# !python -m spacy download es_core_news_lg
+# !python -m spacy download es_core_news_sm
 
-nlp = spacy.load("es_core_news_lg")
+nlp = spacy.load("es_core_news_sm")
 
 doc = nlp("La niña come un suani")
 
@@ -138,7 +137,7 @@ for chunk in doc.noun_chunks:
     print("root::", chunk.root.text)
     print("root dep::", chunk.root.dep_)
     print("root head::", chunk.root.head.text)
-    print("="*10)
+    print("=" * 10)
 
 for token in doc:
     print("token::", token.text)
@@ -147,7 +146,7 @@ for token in doc:
     print("head POS::", token.head.pos_)
     print("CHILDS")
     print([child for child in token.children])
-    print("="*10)
+    print("=" * 10)
 
 # #### Named Entity Recognition (NER)
 
@@ -157,8 +156,11 @@ for token in doc:
 
 from datasets import load_dataset
 
+# +
 from huggingface_hub import login
+
 login()
+# -
 
 # !hf auth whoami
 
@@ -174,10 +176,10 @@ random.seed(42)
 corpus = random.choices(data["train"]["text"], k=3)
 docs = list(nlp.pipe(corpus))
 for j, doc in enumerate(docs):
-    print(f"DOC #{j+1}")
+    print(f"DOC #{j + 1}")
     doc.user_data["title"] = " ".join(doc.text.split()[:10])
     for i, ent in enumerate(doc.ents):
-        print(" -"*10, f"Entity #{i}")
+        print(" -" * 10, f"Entity #{i}")
         print(f"\tTexto={ent.text}")
         print(f"\tstart/end={ent.start_char}-{ent.end_char}")
         print(f"\tLabel={ent.label_}")
@@ -192,7 +194,7 @@ displacy.render(docs, style="ent")
 # Bibliotecas
 from collections import Counter
 import matplotlib.pyplot as plt
-#plt.rcParams['figure.figsize'] = [10, 6]
+plt.rcParams['figure.figsize'] = [10, 6]
 
 mini_corpus = """Humanismo es un concepto polisémico que se aplica tanto al estudio de las letras humanas, los
 estudios clásicos y la filología grecorromana como a una genérica doctrina o actitud vital que
@@ -218,8 +220,9 @@ len(vocabulary)
 def get_frequencies(vocabulary: Counter, n: int) -> list:
     return [_[1] for _ in vocabulary.most_common(n)]
 
+
 def plot_frequencies(frequencies: list, title="Freq of words", log_scale=False):
-    x = list(range(1, len(frequencies)+1))
+    x = list(range(1, len(frequencies) + 1))
     plt.plot(x, frequencies, "-v")
     plt.xlabel("Freq rank (r)")
     plt.ylabel("Freq (f)")
@@ -240,9 +243,11 @@ plot_frequencies(frequencies, log_scale=True)
 
 # ### Ley Zipf
 
-# Utilizaremos un corpus en español, entre más grande mejor.
+# Utilizaremos otro corpus en español, entre más grande mejor (?)
 
-dataset = load_dataset("wikimedia/wikipedia", "20231101.es", split="train", streaming=True)
+dataset = load_dataset(
+    "wikimedia/wikipedia", "20231101.es", split="train", streaming=True
+)
 
 # +
 # dataset?
@@ -304,15 +309,15 @@ corpus_freqs.head(10)
 corpus_freqs[corpus_freqs["word"] == "barriga"]
 
 corpus_freqs["count"].plot(marker="o", legend=False)
-plt.title('Ley de Zipf en el CREA')
-plt.xlabel('rank')
-plt.ylabel('freq')
+plt.title("Ley de Zipf")
+plt.xlabel("rank")
+plt.ylabel("freq")
 plt.show()
 
-corpus_freqs['count'].plot(loglog=True, legend=False)
-plt.title('Ley de Zipf en el CREA (log-log)')
-plt.xlabel('log rank')
-plt.ylabel('log frecuencia')
+corpus_freqs["count"].plot(loglog=True, legend=False)
+plt.title("Ley de Zipf (log-log)")
+plt.xlabel("log rank")
+plt.ylabel("log frecuencia")
 plt.show()
 
 # - Notamos que las frecuencias entre lenguas siguen un patrón
@@ -329,14 +334,6 @@ plt.show()
 
 # #### Formulación de la Ley de Zipf:
 
-# $f(w_{r})=\frac{c}{r^{\alpha }}$
-#
-# En la escala logarítimica:
-#
-# $log(f(w_{r}))=log(\frac{c}{r^{\alpha }})$
-#
-# $log(f(w_{r}))=log (c)-\alpha log (r)$
-
 # #### ❓ ¿Cómo estimar el parámetro $\alpha$?
 
 # Podemos hacer una regresión lineal minimizando la suma de los errores cuadráticos:
@@ -344,42 +341,68 @@ plt.show()
 # $J_{MSE}=\sum_{r}^{}(log(f(w_{r}))-(log(c)-\alpha log(r)))^{2}$
 
 # +
+import numpy as np
 from scipy.optimize import minimize
 
-ranks = np.array(corpus_freqs.index) + 1
-frecs = np.array(corpus_freqs['count'])
+# Obtenemos los ranks y las frecuencias del corpus
+# # +1 para hacer que los ranks inicien en 1 y no en 0
+ranks = np.array(corpus_freqs.index) + 1  
+frequencies = np.array(corpus_freqs["count"])
 
-# Inicialización
-a0 = 1
+def zipf_minimization_objective(alpha: np.float64,
+                               word_ranks: np.ndarray,
+                               word_frequencies: np.ndarray) -> np.float64:
+    """
+    Calculate the sum of squared errors for Zipf's law fit.
 
-# Función de minimización:
-func = lambda a: sum((np.log(frecs)-(np.log(frecs[0])-a*np.log(ranks)))**2)
+    Parameters
+    ----------
+    alpha : np.float64
+        The exponent parameter to optimize in Zipf's law
+    word_ranks : np.ndarray
+        Array of word ranks (1 = most frequent word)
+    word_frequencies : np.ndarray
+        Array of observed word frequencies
 
-# Apliando minimos cuadrados
-a_hat = minimize(func, a0).x[0]
+    Returns
+    -------
+    np.float64
+        Sum of squared errors between log frequencies and Zipf's law prediction
+    """
+    predicted_log_freq = np.log(word_frequencies[0]) - alpha * np.log(word_ranks)
+    return np.sum((np.log(word_frequencies) - predicted_log_freq) ** 2)
 
-print('alpha:', a_hat, '\nMSE:', func(a_hat))
+# Parámeto alfa inicial
+initial_alpha_guess = 1.0
+
+optimization_result = minimize(
+    zipf_minimization_objective,
+    initial_alpha_guess,
+    args=(ranks, frequencies)
+)
+estimated_alpha = optimization_result.x[0]
+
+mean_squared_error = zipf_minimization_objective(estimated_alpha, ranks, frequencies)
+print(f"Estimated alpha: {estimated_alpha:.4f}\nMean Squared Error: {mean_squared_error:.4f}")
 
 
 # -
 
-def plot_generate_zipf(alpha: np.float64, ranks: np.array, freqs: np.array) -> None:
-    plt.plot(np.log(ranks),  np.log(freqs[0]) - alpha*np.log(ranks), color='r', label='Aproximación Zipf')
+def plot_generate_zipf(alpha: np.float64, ranks: np.ndarray, freqs: np.ndarray) -> None:
+    plt.plot(
+        np.log(ranks),
+        np.log(freqs[0]) - alpha * np.log(ranks),
+        color="r",
+        label="Aproximación Zipf",
+    )
 
 
-plot_generate_zipf(a_hat, ranks, frecs)
-plt.plot(np.log(ranks),np.log(frecs), color='b', label='Distribución CREA')
-plt.xlabel('log ranks')
-plt.ylabel('log frecs')
+plot_generate_zipf(estimated_alpha, ranks, frequencies)
+plt.plot(np.log(ranks), np.log(frequencies), color="b", label="Distribución real")
+plt.xlabel("log ranks")
+plt.ylabel("log frecs")
 plt.legend(bbox_to_anchor=(1, 1))
 plt.show()
-
-# #### 📊 Ejercicio: Verificando ley de Zipf
-#
-# - Busca un corpus en otra lengua (no español) en hugging face y descargalo
-#     - Si es muy grande toma una muestra
-# - Estima su parámetro $\alpha$
-# - Verifica a ojo de buen cubero si se cumple la ley de Zipf
 
 # ### Ley de Heap
 
@@ -396,10 +419,195 @@ plt.show()
 # - **TOKENS**: Número total de palabras dentro del texto (incluidas repeticiones)
 # - **TIPOS**: Número total de palabras únicas en el texto
 
-# #### 📊 Ejercicio: Muestra el plot de tokens vs types para el corpus CREA
+# #### 📊 Ejercicio: Muestra el plot de tokens vs types
 #
-# **HINT:** Obtener tipos y tokens acumulados
+# - Hazlo para el corpus en español de wikipedia
+# - Elige un corpus de wikipedia en otro idioma. Haz el mismo plot. ¿Qué observas?
+#
+# **HINT:** Obtener suma de tokens acumuladas` (`numpy.cumsum()`)
 
-# ## Diversidad lingũística 
+# +
+# Tu código bonito acá 🔥
+# -
+
+# ## Diversidad lingüística 
+
+# ### [Glottolog](https://glottolog.org/)
+
+# Glottolog es uncatálogo de las lenguas, familias lingúísticas y dialectos del mundo (identificados como *languids*). Asigna a cada *languoid* un código único y estable. Los *languids* son organizados por clasificaciones genealógicas (un árbol de Glottolog) que está basado en archivos de investigaciones historicas comparables.
+#
+# Podemos [descargar los datos](https://glottolog.org/meta/downloads) de la plataforma gracias a su [licencia libre](https://creativecommons.org/licenses/by/4.0/). Para está práctica utilizarmos los archivo [`languages_and_dialects_geo.csv`](https://cdstar.eva.mpg.de//bitstreams/EAEA0-2198-D710-AA36-0/languages_and_dialects_geo.csv) y [`languoid.csv`](https://cdstar.eva.mpg.de//bitstreams/EAEA0-2198-D710-AA36-0/glottolog_languoid.csv.zip).
+
+# +
+import os
+
+# Se asume que se han descargado los archivo y que se encuentra en la carpeta data/
+DATA_PATH = "data"
+LANG_GEO_FILE = "languages_and_dialects_geo.csv"
+LANGUOID_FILE = "languoid.csv"
+# -
+
+languages = pd.read_csv(os.path.join(DATA_PATH, LANG_GEO_FILE))
+
+languages.head()
+
+languoids = pd.read_csv(os.path.join(DATA_PATH, LANGUOID_FILE))
+
+languoids.head()
+
+# +
+# Mejorar estas coordenadas
+min_lat = 14.5
+max_lat = 32.7
+min_long = -118.4
+max_long = -86.8
+
+mexico_languages = languages[
+    (languages["latitude"] >= min_lat)
+    & (languages["latitude"] <= max_lat)
+    & (languages["longitude"] >= min_long)
+    & (languages["longitude"] <= max_long)
+]
+
+# +
+# Reconstrucción de linajes usando grafos locales (languoid.csv)
+languoids_dict = languoids.set_index('id').to_dict('index')
+
+def reconstruir_linaje(glottocode):
+    """Sube por el árbol genealógico desde la lengua hasta la familia raíz."""
+    linaje = []
+    current_id = glottocode
+    
+    # Mientras el ID actual exista y no sea nulo (NaN)
+    while pd.notna(current_id) and current_id in languoids_dict:
+        nodo = languoids_dict[current_id]
+        
+        # Filtramos lenguas artificiales o "bookkeeping"
+        if nodo.get('bookkeeping') or nodo.get('name') == 'Unclassifiable':
+            return "Unclassifiable"
+            
+        # Insertamos el nombre al inicio de la lista para mantener el orden (Raíz -> Lengua)
+        linaje.insert(0, str(nodo['name']))
+        
+        # Subimos al nodo padre
+        current_id = nodo['parent_id']
+        
+    return " > ".join(linaje)
 
 
+# +
+# Aplicamos la función a nuestras lenguas de México
+mexico_languages = mexico_languages.copy()
+mexico_languages['tree'] = mexico_languages['glottocode'].apply(reconstruir_linaje)
+
+# Filtramos las que no se pudieron clasificar
+df = mexico_languages[~mexico_languages['tree'].isin(['', "Unclassifiable"])].copy()
+
+# Extraemos la familia lingüística (la primera palabra del linaje)
+df['Family'] = df['tree'].str.split().str[0]
+df.set_index("glottocode", inplace=True)
+df.head()
+# -
+
+p = df[df["name"] == "Huichol"]
+p["tree"]["huic1243"]
+
+# +
+import plotly.graph_objects as go
+
+def longest_common_prefix(str1, str2):
+    """Calcula el ratio del prefijo común más largo entre dos linajes."""
+    min_length = min(len(str1), len(str2))
+    common_prefix = ""
+
+    for i in range(min_length):
+        if str1[i] == str2[i]:
+            common_prefix += str1[i]
+        else:
+            break
+            
+    # Normalizamos el resultado
+    return len(common_prefix) / min_length if min_length > 0 else 0
+
+# Creamos la matriz de distancias vacía
+n = len(df)
+distance_matrix = pd.DataFrame(index=df.index, columns=df.index, dtype=float)
+
+# Poblamos la matriz calculando la similitud por pares
+for i in range(n):
+    for j in range(i, n):
+        distance = longest_common_prefix(df['tree'].iloc[i], df['tree'].iloc[j])
+        distance_matrix.iloc[i, j] = distance
+        distance_matrix.iloc[j, i] = distance
+
+distance_df = pd.DataFrame(distance_matrix.values, index=df.index, columns=df.index)
+
+# Ordenamos las lenguas por familia para una mejor visualización en el mapa de calor
+ordered_languages = df.sort_values('Family').index
+ordered_similarity_df = distance_df.reindex(index=ordered_languages, columns=ordered_languages)
+# -
+
+ordered_similarity_df.head()
+
+# +
+# Mapeamos los glottocodes a los nombres reales de las lenguas para las etiquetas
+labels = ordered_similarity_df.columns.map(lambda x: df.loc[x, 'name'])
+
+# Generamos el mapa de calor
+fig = go.Figure(data=go.Heatmap(z=ordered_similarity_df, x=labels, y=labels))
+fig.update_layout(title='Matriz de Similitud Genealógica',
+                  xaxis={'side': 'top'},
+                  width=1200, height=1200)
+fig.show()
+# -
+
+# ## Práctica 2: Propiedades estadísticas del lenguaje y Diversidad
+#
+# ### Fecha de entrega: 17 de Marzo de 2026 11:59pm 
+#
+# **1. Verificación empírica de la Ley de Zipf**
+#
+# Verificar si la ley de Zipf se cumple en los siguientes casos:
+#
+# 1. En un lenguaje artificial creado por ustedes.
+#     * Creen un script que genere un texto aleatorio seleccionando caracteres al azar de un alfabeto definido. 
+#         * **Nota:** Asegúrense de incluir el carácter de "espacio" en su alfabeto para que el texto se divida en "palabras" de longitudes variables.
+#     * Obtengan las frecuencias de las palabras generadas para este texto artificial
+# 2. Alguna lengua de bajos recursos digitales (*low-resourced language*)
+#     * Busca un corpus de libre acceso en alguna lengua de bajos recursos digitales
+#     * Obten las frecuencias de sus palabras
+#
+# En ambos casos realiza lo siguiente:
+# * Estima el parámetro $\alpha$ que mejor se ajuste a la curva
+# * Generen las gráficas de rango vs. frecuencia (en escala y logarítmica).
+#     * Incluye la recta aproximada por $\alpha$
+# * ¿Se aproxima a la ley de Zipf? Justifiquen su respuesta comparándolo con el comportamiento del corpus visto en clase.
+#
+# > [!TIP]
+# > Puedes utilizar los corpus del paquete [`py-elotl`](https://pypi.org/project/elotl/)
+#
+# ### 2. Visualizando la diversidad lingüística de México
+#
+# 1. Usando los datos de Glottolog filtralos con base en la región geográfica que corresponde a México
+#     - Usa las columnas `"longitude"` y `"latitude"`
+# 2. Realiza un plot de las lenguas por región de un mapa
+#     - Utiliza un color por familia linguistica en el mapa
+# 3. Haz lo mismo para otro país del mundo
+#
+# Responde las preguntas:
+#
+# - ¿Que tanta diversidad lingüística hay en México con respecto a otras regiones?
+# - ¿Cuál es la zona que dirias que tiene mayor diversidad en México?
+#
+# > [!TIP]
+# > Utiliza la biblioteca [`plotly`](https://plotly.com/python/getting-started/) para crear mapa interactivos
+#
+# ### EXTRA. Desempeño de NER en distintos dominios (Out-of-domain)
+#
+# Explorar la plataforma [Hugging Face Datasets](https://huggingface.co/datasets) y elegir documentos en Español provenientes de al menos 3 dominios muy distintos (ej. noticias, artículos médicos, tweets/redes sociales, foros legales).
+# * Realizar Reconocimiento de Entidades Nombradas (NER) en muestras de cada dominio utilizando spaCy o la herramienta de su preferencia.
+# * Mostrar una distribución de frecuencias de las etiquetas (PER, ORG, LOC, etc.) más comunes por dominio.
+# * **Análisis:** Incluyan comentarios críticos sobre el desempeño observado. ¿En qué dominio el modelo cometió más errores y a qué creen que se deba estadísticamente?
+#
+# > [!TIP]
+# > Utiliza bibliotecas con modelos preentrenados que te permitan realizar el etiquetado NER como [`spacy`](https://spacy.io/usage) o [`stanza`](https://stanfordnlp.github.io/stanza/#getting-started).
