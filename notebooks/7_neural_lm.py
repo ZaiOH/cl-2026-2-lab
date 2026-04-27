@@ -17,6 +17,9 @@
 # # 7. Modelos:  BPE, Embeddings, Neural LM
 
 # %% [markdown]
+# ![](https://lena-voita.github.io/resources/lectures/lang_models/neural/nn_lm_idea_linear-min.png)
+
+# %% [markdown]
 # <a target="_blank" href="https://colab.research.google.com/github/umoqnier/cl-2026-2-lab/blob/main/notebooks/7_neural_lm.ipynb">
 #   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
 # </a>
@@ -39,6 +42,7 @@ from rich import print as rprint
 from nltk import word_tokenize
 from collections import Counter
 from nltk.stem.snowball import SnowballStemmer
+
 
 # %% [markdown]
 # ## Funciones de preprocesamiento
@@ -358,6 +362,7 @@ news_databuilder = load_dataset_builder("LeoCordoba/CC-NEWS-ES", "mx")
 rprint(news_databuilder.info)
 
 # %%
+from datasets import load_dataset
 news_dataset = load_dataset(
     "LeoCordoba/CC-NEWS-ES", "mx", split="train", streaming=True
 )
@@ -489,9 +494,11 @@ def train_model(
 # ### CBOW
 
 # %%
-skipm_gram_model = load_model(
-    os.path.join(EMB_MODELS_DIR, "eswiki-xl-300-SKIP_GRAM.model")
+import os 
+skip_gram_model = load_model(
+    os.path.join(EMB_MODELS_DIR, "es_news_hf-vs300-w5-SKIP_GRAM.model")
 )
+#cbow_model = load_model(os.path.join(EMB_MODELS_DIR, "es_wiki"))
 
 # %%
 # %%time
@@ -546,7 +553,7 @@ report_stats(skip_gram_model)
 
 # %%
 models = {
-    Algorithms.CBOW: cbow_model,
+    #Algorithms.CBOW: cbow_model,
     Algorithms.SKIP_GRAM: skip_gram_model,
 }
 
@@ -576,7 +583,7 @@ agustisidad_vec[:10]
 len(agustisidad_vec)
 
 # %%
-model.wv.most_similar("mercado", topn=5)
+model.wv.most_similar("dios", topn=5)
 
 # %% [markdown]
 # Podemos ver como la similitud entre palabras decrece
@@ -601,7 +608,7 @@ model.wv.most_similar(positive=["saltillo", "morelos"], negative=["cuernavaca"])
 model.wv.doesnt_match(["disco", "música", "mantequilla", "cantante"])
 
 # %%
-model.wv.similarity("noche", "noches")
+model.wv.similarity("noche", "día")
 
 # %% [markdown]
 # #### Evaluación

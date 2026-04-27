@@ -52,7 +52,7 @@
 # ![](https://i.makeagif.com/media/11-05-2015/x60GaR.gif)
 
 # %% [markdown]
-# Al crear sistemas de *NLP* nos enfrentamos con problemas complejos. Conviene entonces separar dichos problemas en pequeños problemas que podamos manejar y resolver por separado. 
+# Al crear sistemas de *NLP* nos enfrentamos con problemas complejos. Conviene entonces separar dichos problemas en pequeños problemas que podamos manejar y resolver por separado.
 #
 # El preprocessamiento es el primer paso de este proceso. Otros elementos pueden ser los siguientes:
 #
@@ -107,7 +107,7 @@ if posts:
     rows = posts.find_all("li")
     for row in rows:
         text = row.get_text()
-        rprint(text)
+        print(text)
 
 # %%
 import nltk
@@ -274,7 +274,7 @@ def preprocess(words: list[str], regex: str=r"[^\w+]", lang: str="en", remove_st
         word = re.sub(regex, "", word).lower()
         if remove_stops and word in stopwords.words(stop_lang) or (len(word) < 2):
             continue
-        
+
         if remove_accents:
             word = strip_accents(word)
         result.append(word)
@@ -456,7 +456,7 @@ rprint("Tipos:", len(Counter(brown_corpus)))
 # #### Steamming
 
 # %% [markdown]
-# - Chiquitititos - chico - Chiqu 
+# - Chiquitititos - chico - Chiqu
 
 # %%
 from nltk.stem.snowball import SnowballStemmer
