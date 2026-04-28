@@ -31,9 +31,11 @@ dependencies = [
 [project.optional-dependencies]
 cpu = [
   "torch>=2.10.0",
+  "torchvision>=0.26.0",
 ]
 cu130 = [
   "torch>=2.10.0",
+  "torchvision>=0.26.0",
 ]
 
 [tool.uv]
@@ -49,6 +51,11 @@ torch = [
   { index = "pytorch-cpu", extra = "cpu" },
   { index = "pytorch-cu130", extra = "cu130" },
 ]
+torchvision = [
+  { index = "pytorch-cpu", extra = "cpu" },
+  { index = "pytorch-cu130", extra = "cu130" },
+]
+
 
 [[tool.uv.index]]
 name = "pytorch-cpu"
